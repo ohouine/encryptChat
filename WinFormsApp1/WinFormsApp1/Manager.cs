@@ -46,15 +46,9 @@ namespace WinFormsApp1
                 listener.Start();
 
                 using TcpClient handler = await listener.AcceptTcpClientAsync();
-                await using NetworkStream stream = handler.GetStream();
-
-                var message = $"📅 {DateTime.Now} 🕛";
-                var dateTimeBytes = Encoding.UTF8.GetBytes(message);
-                await stream.WriteAsync(dateTimeBytes);
-
-                Console.WriteLine($"Sent message: \"{message}\"");
-                // Sample output:
-                //     Sent message: "📅 8/22/2022 9:07:17 AM 🕛"
+                await using (NetworkStream stream = handler.GetStream()) { 
+                
+                }
             }
             finally
             {
