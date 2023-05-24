@@ -6,28 +6,32 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
+
 namespace WinFormsApp1
 {
     class Manager
     {
 
-        public async void TestSend()
+        public async void TestSend(string text)
         {
 
-            IPAddress ipAddress = IPAddress.Parse("10.tamere...");
+            Debug.WriteLine($"Start sending:");
+
+            IPAddress ipAddress = IPAddress.Parse("10.5.43.37");
             IPEndPoint ipEndPoint = new(ipAddress, 666);
 
-            ipEndPoint = new IPEndPoint(ipAddress, 13);
+            ipEndPoint = new IPEndPoint(ipAddress, 666);
 
             using TcpClient client = new();
             await client.ConnectAsync(ipEndPoint);
             await using NetworkStream stream = client.GetStream();
 
-            var buffer = new byte[1_024];
+            byte[] buffer = Encoding.UTF8.GetBytes(text);
             int received = await stream.ReadAsync(buffer);
 
             var message = Encoding.UTF8.GetString(buffer, 0, received);
-            Console.WriteLine($"Message received: \"{message}\"");
+            Debug.WriteLine($"Message received: \"{message}\"");
             // Sample output:
             //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
         }
