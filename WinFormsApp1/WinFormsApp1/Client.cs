@@ -19,6 +19,7 @@ namespace WinFormsApp1
             iPAddress = IPAddress.Parse("10.5.43.32");
             iPEndPoint = new(iPAddress, 666);
             client = new();
+            HandShake();
         }
 
         public async void HandShake()
@@ -40,13 +41,21 @@ namespace WinFormsApp1
 
         public async void StreamWrite()
         {
-            await using NetworkStream stream = client.GetStream();
-            var message = $"📅 {DateTime.Now} 🕛";
-            var dateTimeBytes = Encoding.UTF8.GetBytes(message);
-            await stream.WriteAsync(dateTimeBytes);
-            Debug.WriteLine($"Sent message: \"{message}\"");
-            // Sample output:
-            //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
+            if (client.Connected)
+            {
+                await using NetworkStream stream = client.GetStream();
+                var message = $"📅 {DateTime.Now} 🕛";
+                var dateTimeBytes = Encoding.UTF8.GetBytes(message);
+                await stream.WriteAsync(dateTimeBytes);
+                Debug.WriteLine($"Sent message: \"{message}\"");
+                // Sample output:
+                //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
+            }
+            else
+            {
+                HandShake();
+            }
+
         }
 
     }
