@@ -24,18 +24,17 @@ namespace WinFormsApp1
         {
             iPAddress = IPAddress.Parse("10.5.43.32");
             iPEndPoint = new(iPAddress, 666);
-            client = CreateTcpClient();
+            client = new ();
+            CreateTcpClient();
             listener = CreateListener();
         }
 
-        private TcpClient CreateTcpClient()
+        private async void CreateTcpClient()
         {
-            using TcpClient client = new();
-            return client;
+            await client.ConnectAsync(iPEndPoint);
         }
         public async void StreamWrite(string text)
         {
-            await client.ConnectAsync(iPEndPoint);
             bool isOpen = false;
             listener.Start();
             while (!isOpen)
@@ -60,9 +59,8 @@ namespace WinFormsApp1
             listener.Stop();
 
         }
-        public async void StreamRead(string text)
+        public async void StreamRead()
         {
-            await client.ConnectAsync(iPEndPoint);
             bool isOpen = false;
             listener.Start();
             while (!isOpen)
