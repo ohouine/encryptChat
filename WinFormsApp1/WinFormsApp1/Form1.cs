@@ -2,6 +2,7 @@ namespace WinFormsApp1
 {
     public partial class Form1 : Form
     {
+            Manager man = new Manager();
         public Form1()
         {
             InitializeComponent();
@@ -9,8 +10,7 @@ namespace WinFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Manager man = new Manager();
-            man.TestSend(rtbMessage.Text);
+            man.StreamWrite(rtbMessage.Text);
         }
     }
 }

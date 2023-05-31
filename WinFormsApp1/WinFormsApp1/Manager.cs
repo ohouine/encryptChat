@@ -7,54 +7,90 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
+using System.Net.NetworkInformation;
 
 namespace WinFormsApp1
 {
     class Manager
     {
+        IPAddress iPAddress;
+        IPEndPoint iPEndPoint;
+        TcpClient client;
+        TcpListener listener;
 
-        public async void TestSend(string text)
+
+        public Manager()
         {
-
-            Debug.WriteLine($"Start sending:");
-
-            IPAddress ipAddress = IPAddress.Parse("10.5.43.37");
-            IPEndPoint ipEndPoint = new(ipAddress, 666);
-
-            ipEndPoint = new IPEndPoint(ipAddress, 666);
-
-            using TcpClient client = new();
-            await client.ConnectAsync(ipEndPoint);
-            await using NetworkStream stream = client.GetStream();
-
-            byte[] buffer = Encoding.UTF8.GetBytes(text);
-            int received = await stream.ReadAsync(buffer);
-
-            var message = Encoding.UTF8.GetString(buffer, 0, received);
-            Debug.WriteLine($"Message received: \"{message}\"");
-            // Sample output:
-            //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
+            iPAddress = IPAddress.Parse("10.5.43.32");
+            iPEndPoint = new(iPAddress, 666);
+            client = CreateTcpClient();
+            listener = CreateListener();
         }
 
-        public async void Listener()
+        private TcpClient CreateTcpClient()
         {
-            var ipEndPoint = new IPEndPoint(IPAddress.Any, 666);
-            TcpListener listener = new(ipEndPoint);
-
-            try
+            using TcpClient client = new();
+            return client;
+        }
+        public async void StreamWrite(string text)
+        {
+            await client.ConnectAsync(iPEndPoint);
+            bool isOpen = false;
+            listener.Start();
+            while (!isOpen)
             {
-                listener.Start();
+                try
+                {
+                    client = await listener.AcceptTcpClientAsync();
+                    await using NetworkStream stream = client.GetStream();
+                    var message = $"📅 {DateTime.Now} 🕛";
+                    var dateTimeBytes = Encoding.UTF8.GetBytes(message);
+                    await stream.WriteAsync(dateTimeBytes);
+                    Debug.WriteLine($"Sent message: \"{message}\"");
+                    // Sample output:
+                    //     Sent message: "📅 8/22/2022 9:07:17 AM 🕛"
 
-                using TcpClient handler = await listener.AcceptTcpClientAsync();
-                await using (NetworkStream stream = handler.GetStream()) { 
-                
+                }
+                finally
+                {
+                    isOpen = true;
                 }
             }
-            finally
+            listener.Stop();
+
+        }
+        public async void StreamRead(string text)
+        {
+            await client.ConnectAsync(iPEndPoint);
+            bool isOpen = false;
+            listener.Start();
+            while (!isOpen)
             {
-                listener.Stop();
+                try
+                {
+                    client = await listener.AcceptTcpClientAsync();
+                    await using NetworkStream stream = client.GetStream();
+                    var buffer = new byte[1_024];
+                    int received = await stream.ReadAsync(buffer);
+                    var message = Encoding.UTF8.GetString(buffer, 0, received);
+                    // Sample output:
+                    //     Sent message: "📅 8/22/2022 9:07:17 AM 🕛"
+
+                }
+                finally
+                {
+                    isOpen = true;
+                }
             }
+            listener.Stop();
         }
 
+        private TcpListener CreateListener()
+        {
+            TcpListener listener = new(iPEndPoint);
+            return listener;
+        }
     }
 }
+
