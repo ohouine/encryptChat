@@ -28,44 +28,78 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
-            this.rtbMessage = new System.Windows.Forms.RichTextBox();
-            this.SuspendLayout();
+            btnSend = new Button();
+            rtbMessage = new RichTextBox();
+            txtIp = new TextBox();
+            lblIp = new Label();
+            lblMessage = new Label();
+            SuspendLayout();
             // 
-            // button1
+            // btnSend
             // 
-            this.button1.Location = new System.Drawing.Point(0, 0);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            btnSend.Location = new Point(362, 101);
+            btnSend.Name = "btnSend";
+            btnSend.Size = new Size(75, 23);
+            btnSend.TabIndex = 0;
+            btnSend.Text = "Send";
+            btnSend.UseVisualStyleBackColor = true;
+            btnSend.Click += button1_Click;
             // 
             // rtbMessage
             // 
-            this.rtbMessage.Location = new System.Drawing.Point(251, 39);
-            this.rtbMessage.Name = "rtbMessage";
-            this.rtbMessage.Size = new System.Drawing.Size(100, 96);
-            this.rtbMessage.TabIndex = 1;
-            this.rtbMessage.Text = "";
+            rtbMessage.Location = new Point(135, 52);
+            rtbMessage.Name = "rtbMessage";
+            rtbMessage.Size = new Size(100, 96);
+            rtbMessage.TabIndex = 1;
+            rtbMessage.Text = "";
+            // 
+            // txtIp
+            // 
+            txtIp.Location = new Point(348, 52);
+            txtIp.Name = "txtIp";
+            txtIp.Size = new Size(100, 23);
+            txtIp.TabIndex = 2;
+            // 
+            // lblIp
+            // 
+            lblIp.AutoSize = true;
+            lblIp.Location = new Point(348, 28);
+            lblIp.Name = "lblIp";
+            lblIp.Size = new Size(68, 15);
+            lblIp.TabIndex = 3;
+            lblIp.Text = "Addresse Ip";
+            // 
+            // lblMessage
+            // 
+            lblMessage.AutoSize = true;
+            lblMessage.Location = new Point(139, 25);
+            lblMessage.Name = "lblMessage";
+            lblMessage.Size = new Size(53, 15);
+            lblMessage.TabIndex = 4;
+            lblMessage.Text = "Message";
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.rtbMessage);
-            this.Controls.Add(this.button1);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Controls.Add(lblMessage);
+            Controls.Add(lblIp);
+            Controls.Add(txtIp);
+            Controls.Add(rtbMessage);
+            Controls.Add(btnSend);
+            Name = "Form1";
+            Text = "Form1";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
-        private Button button1;
+        private Button btnSend;
         private RichTextBox rtbMessage;
+        private TextBox txtIp;
+        private Label lblIp;
+        private Label lblMessage;
     }
 }

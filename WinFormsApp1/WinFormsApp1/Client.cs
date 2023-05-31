@@ -14,9 +14,9 @@ namespace WinFormsApp1
         IPAddress iPAddress;
         IPEndPoint iPEndPoint;
         TcpClient client;
-        public Client()
+        public Client(string ip)
         {
-            iPAddress = IPAddress.Parse("10.5.43.32");
+            iPAddress = IPAddress.Parse(ip);
             iPEndPoint = new(iPAddress, 666);
             client = new();
             HandShake();
@@ -39,15 +39,14 @@ namespace WinFormsApp1
             //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
         }
 
-        public async void StreamWrite()
+        public async void StreamWrite(string text)
         {
             if (client.Connected)
             {
                 await using NetworkStream stream = client.GetStream();
-                var message = $"📅 {DateTime.Now} 🕛";
-                var dateTimeBytes = Encoding.UTF8.GetBytes(message);
-                await stream.WriteAsync(dateTimeBytes);
-                Debug.WriteLine($"Sent message: \"{message}\"");
+                var textBytes = Encoding.UTF8.GetBytes(text);
+                await stream.WriteAsync(textBytes);
+                Debug.WriteLine($"Sent message: \"{text}\"");
                 // Sample output:
                 //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
             }
