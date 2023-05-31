@@ -24,7 +24,14 @@ namespace WinFormsApp1
 
         public async void HandShake()
         {
-            await client.ConnectAsync(iPEndPoint);
+            try
+            {
+                await client.ConnectAsync(iPEndPoint);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}");
+            }
         }
 
         public async void StreamRead()
