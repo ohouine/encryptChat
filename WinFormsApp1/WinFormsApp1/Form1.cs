@@ -7,14 +7,17 @@ namespace WinFormsApp1
         public Form1()
         {
             InitializeComponent();
-            listener = new Listener();
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+
+        }
+
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
             client = new Client(txtIp.Text);
-            client.StreamWrite(rtbMessage.Text);
         }
     }
 }

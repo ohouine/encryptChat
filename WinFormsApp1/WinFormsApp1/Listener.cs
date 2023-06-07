@@ -8,6 +8,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Sodium;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Forms;
 
 namespace WinFormsApp1
 {
@@ -16,11 +18,15 @@ namespace WinFormsApp1
         IPEndPoint iPEndPoint;
         TcpListener listener;
         TcpClient client;
+        byte[] _nonce;
+        byte[] _key;
+        int handShakeStep = 0;
 
         public Listener()
         {
             iPEndPoint = new IPEndPoint(IPAddress.Any, 666);
             listener = new TcpListener(iPEndPoint);
+            _key = SecretBox.GenerateKey();
             HandShake();
         }
         public async void HandShake()
@@ -31,7 +37,10 @@ namespace WinFormsApp1
             try
             {
                 client = await listener.AcceptTcpClientAsync();
-                StreamRead();
+                var textBytes = Encoding.UTF8.GetBytes("hello");
+                MessageBox.Show($"Sent message: \"hello\"");
+                HandShakeStep(textBytes);
+                handShakeStep++;
             }
             catch (Exception ex)
             {
@@ -39,10 +48,10 @@ namespace WinFormsApp1
             }
         }
 
-        public async void StreamWrite(string text)
+      /*  public async void StreamWrite(string text)
         {
             await using NetworkStream stream = client.GetStream();
-            byte[] nonce = SecretBox.GenerateNonce();
+
             byte[] key = SecretBox.GenerateKey();
             var message = $"📅 {DateTime.Now} 🕛";
             var dateTimeBytes = Encoding.UTF8.GetBytes(message);
@@ -50,25 +59,51 @@ namespace WinFormsApp1
             toSend.Concat(nonce.Concat(key.Concat(dateTimeBytes)));
             await stream.WriteAsync(toSend);
             Debug.WriteLine($"Sent message: \"{message}\"");
-        }
-        public static byte[] ObjectToByteArray(Object obj)
-        {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (var ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
+        }*/
         public async void StreamRead()
         {
-            await using NetworkStream stream = client.GetStream();
-            var buffer = new byte[1_024];
-            int received = await stream.ReadAsync(buffer);
-            var message = Encoding.UTF8.GetString(buffer, 0, received);
-            Debug.WriteLine($"Message received: \"{message}\"");
-            // Sample output:
-            //     Message received: "📅 8/22/2022 9:07:17 AM 🕛"
+            while (true)
+            {
+                try
+                {
+                    await using NetworkStream stream = client.GetStream();
+                    var buffer = new byte[1_024];
+                    int received = await stream.ReadAsync(buffer);
+                    HandShakeStep(buffer);
+                    var message = Encoding.UTF8.GetString(buffer, 0, received);
+                    MessageBox.Show($"Message received: \"{message}\"");
+                }
+                catch (Exception ex)
+                {
+
+                }   
+            }
+            
+        }
+        public async void HandShakeStep(byte[] buffer)
+        {
+            switch (handShakeStep)
+            {
+                case 0:
+                    {
+                        await using NetworkStream stream = client.GetStream();
+                        await stream.WriteAsync(buffer);
+                        handShakeStep++;
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (buffer.Length == 24)
+                        {
+                            _nonce = buffer;
+                            await using NetworkStream stream = client.GetStream();
+                            await stream.WriteAsync(_key);
+                            MessageBox.Show($"Sent message: \"{_key}\"");
+                            handShakeStep++;
+                        }
+                        break;
+                    }
+            }
         }
     }
 }

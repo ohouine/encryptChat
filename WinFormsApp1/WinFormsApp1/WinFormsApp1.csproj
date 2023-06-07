@@ -9,4 +9,8 @@
     <StartupObject></StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Sodium.Core" Version="1.3.3" />
+  </ItemGroup>
+
 </Project>

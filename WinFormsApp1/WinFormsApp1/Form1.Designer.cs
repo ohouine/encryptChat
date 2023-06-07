@@ -33,6 +33,7 @@
             txtIp = new TextBox();
             lblIp = new Label();
             lblMessage = new Label();
+            btnConnect = new Button();
             SuspendLayout();
             // 
             // btnSend
@@ -59,6 +60,7 @@
             txtIp.Name = "txtIp";
             txtIp.Size = new Size(100, 23);
             txtIp.TabIndex = 2;
+            txtIp.Text = "10.5.43.55";
             // 
             // lblIp
             // 
@@ -78,11 +80,22 @@
             lblMessage.TabIndex = 4;
             lblMessage.Text = "Message";
             // 
+            // btnConnect
+            // 
+            btnConnect.Location = new Point(462, 101);
+            btnConnect.Name = "btnConnect";
+            btnConnect.Size = new Size(75, 23);
+            btnConnect.TabIndex = 5;
+            btnConnect.Text = "Connect";
+            btnConnect.UseVisualStyleBackColor = true;
+            btnConnect.Click += btnConnect_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnConnect);
             Controls.Add(lblMessage);
             Controls.Add(lblIp);
             Controls.Add(txtIp);
@@ -101,5 +114,6 @@
         private TextBox txtIp;
         private Label lblIp;
         private Label lblMessage;
+        private Button btnConnect;
     }
 }
