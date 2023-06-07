@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace WinFormsApp1
 {
     public partial class Form1 : Form
@@ -15,9 +17,13 @@ namespace WinFormsApp1
 
         }
 
-        private void btnConnect_Click(object sender, EventArgs e)
+        private async void btnConnect_Click(object sender, EventArgs e)
         {
             client = new Client(txtIp.Text);
+            if (!await client.HandShake())
+            {
+                Debug.WriteLine("btnConnect_Click - HandShake failed");
+            }
         }
     }
 }

@@ -15,95 +15,125 @@ namespace WinFormsApp1
 {
     class Listener
     {
+        const int NonceLen = 24;
+        const int HandShakeStepCount = 3;
         IPEndPoint iPEndPoint;
         TcpListener listener;
         TcpClient client;
         byte[] _nonce;
         byte[] _key;
-        int handShakeStep = 0;
+        int handShakeStep;
 
         public Listener()
         {
             iPEndPoint = new IPEndPoint(IPAddress.Any, 666);
             listener = new TcpListener(iPEndPoint);
             _key = SecretBox.GenerateKey();
-            HandShake();
+            handShakeStep = 0;
         }
-        public async void HandShake()
+        public async Task<bool> HandShake()
         {
-            if (listener == null)
-                return;
             listener.Start();
+            while (handShakeStep < HandShakeStepCount)
+            {
+                Debug.WriteLine("HandShake - handShakeStep=" + handShakeStep);
+                switch (handShakeStep)
+                {
+                    case 0:
+                        {
+                            bool bRetValue = await AcceptClientAsync();
+                            if (!bRetValue)
+                            {
+                                Debug.WriteLine("HandShake - fail to connect");
+                                return false;
+                            }
+                            // Next step
+                            handShakeStep++;
+                            Debug.WriteLine("HandShake - connected");
+                            break;
+                        }
+                    case 1:
+                        {
+                            bool bRetValue = await InternalStreamWriteAsync(Encoding.UTF8.GetBytes("Hello"));
+                            if (!bRetValue)
+                            {
+                                Debug.WriteLine("HandShake - fail to send Hello");
+                                return false;
+                            }
+                            // Next step
+                            handShakeStep++;
+                            Debug.WriteLine("HandShake - sended Hello");
+                            break;
+                        }
+                    case 2:
+                        {
+                            byte[] buffer = await InternalStreamReadAsync();
+                            if (buffer.Length != NonceLen)
+                            {
+                                Debug.WriteLine("HandShake - fail to receive nonce");
+                                return false;
+                            }
+                            // Next step
+                            handShakeStep++;
+                            Debug.WriteLine("HandShake - received nonce");
+                            break;
+                        }
+                }
+            }
+            listener.Stop();
+            return true;
+        }
+        private async Task<bool> AcceptClientAsync()
+        {
             try
             {
                 client = await listener.AcceptTcpClientAsync();
-                var textBytes = Encoding.UTF8.GetBytes("hello");
-                MessageBox.Show($"Sent message: \"hello\"");
-                HandShakeStep(textBytes);
-                handShakeStep++;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"HandShake exception: {ex.Message}");
+                Debug.WriteLine($"AcceptClientAsync - Exception - {ex.Message}");
+                return false;
             }
+            return true;
         }
-
-      /*  public async void StreamWrite(string text)
+        private async Task<byte[]> InternalStreamReadAsync()
         {
-            await using NetworkStream stream = client.GetStream();
-
-            byte[] key = SecretBox.GenerateKey();
-            var message = $"📅 {DateTime.Now} 🕛";
-            var dateTimeBytes = Encoding.UTF8.GetBytes(message);
-            byte[] toSend = new byte[nonce.Length + key.Length + message.Length];
-            toSend.Concat(nonce.Concat(key.Concat(dateTimeBytes)));
-            await stream.WriteAsync(toSend);
-            Debug.WriteLine($"Sent message: \"{message}\"");
-        }*/
-        public async void StreamRead()
-        {
-            while (true)
+            var buffer = new byte[1_024];
+            try
             {
-                try
+                await using NetworkStream stream = client.GetStream();
+                int received = await stream.ReadAsync(buffer);
+                if (received > 0)
                 {
-                    await using NetworkStream stream = client.GetStream();
-                    var buffer = new byte[1_024];
-                    int received = await stream.ReadAsync(buffer);
-                    HandShakeStep(buffer);
-                    var message = Encoding.UTF8.GetString(buffer, 0, received);
-                    MessageBox.Show($"Message received: \"{message}\"");
+                    Debug.WriteLine("InternalStreamReadAsync - buffer received: " + BitConverter.ToString(buffer));
                 }
-                catch (Exception ex)
+                else
                 {
+                    Debug.WriteLine("InternalStreamReadAsync - buffer received empty ");
+                }
 
-                }   
             }
-            
-        }
-        public async void HandShakeStep(byte[] buffer)
-        {
-            switch (handShakeStep)
+            catch (Exception ex)
             {
-                case 0:
-                    {
-                        await using NetworkStream stream = client.GetStream();
-                        await stream.WriteAsync(buffer);
-                        handShakeStep++;
-                        break;
-                    }
-                    case 1:
-                    {
-                        if (buffer.Length == 24)
-                        {
-                            _nonce = buffer;
-                            await using NetworkStream stream = client.GetStream();
-                            await stream.WriteAsync(_key);
-                            MessageBox.Show($"Sent message: \"{_key}\"");
-                            handShakeStep++;
-                        }
-                        break;
-                    }
+                Debug.WriteLine($"InternalStreamReadAsync  -  Exception - {ex.Message}");
             }
+            return buffer;
+        }
+
+        private async Task<bool> InternalStreamWriteAsync(byte[] buffer)
+        {
+            try
+            {
+                await using NetworkStream stream = client.GetStream();
+                await stream.WriteAsync(buffer);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"InternalStreamWriteAsync  -  Exception - {ex.Message}");
+                return false;
+            }
+            // Done
+            return true;
         }
     }
 }
