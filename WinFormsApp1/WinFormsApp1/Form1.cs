@@ -8,11 +8,12 @@ namespace WinFormsApp1
         {
             InitializeComponent();
             listener = new Listener();
+
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Client client = new Client(txtIp.Text);
+            client = new Client(txtIp.Text);
             client.StreamWrite(rtbMessage.Text);
         }
     }

@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "pIEjFWjcxDni+3CBz+naoa7LHctFH++B/UF8ouNrnNKu+w43OPlGY4kZlBdTBbjMxpl7WLAWUa+Pe5LyvIz9Ew==",
+  "dgSpecHash": "oObZ/p8t3L7zagjuqC/VkebLhBHCKT95WRBh+B9C+IZNL5UZaYRFab40eNs7gacMfdi+Masz5IzXPEsxnl1vpA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Kevin\\Desktop\\chatEncrypt\\encryptChat\\WinFormsApp1\\WinFormsApp1\\WinFormsApp1.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Kevin\\.nuget\\packages\\libsodium\\1.0.18.4\\libsodium.1.0.18.4.nupkg.sha512",
+    "C:\\Users\\Kevin\\.nuget\\packages\\sodium.core\\1.3.3\\sodium.core.1.3.3.nupkg.sha512"
+  ],
   "logs": []
 }
